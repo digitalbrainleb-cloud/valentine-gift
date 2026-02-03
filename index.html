@@ -131,15 +131,15 @@
         }
         
         .option.correct {
-            background-color: #d4edda;
-            border-color: #28a745;
-            color: #155724;
+            background-color: #ffecf1;
+            border-color: #ff85a2;
+            color: #d63384;
         }
         
         .option.wrong {
-            background-color: #f8d7da;
-            border-color: #dc3545;
-            color: #721c24;
+            background-color: #ffe6e6;
+            border-color: #ff6b6b;
+            color: #d63384;
         }
         
         .feedback {
@@ -152,13 +152,19 @@
         }
         
         .happy-face {
-            color: #28a745;
+            color: #ff4d8d !important;
             font-size: 2.5rem;
         }
         
         .sad-face {
-            color: #dc3545;
+            color: #ff6b6b;
             font-size: 2.5rem;
+        }
+        
+        .correct-message {
+            color: #d63384 !important;
+            font-size: 1.5rem;
+            margin-left: 10px;
         }
         
         .final-message {
@@ -206,15 +212,14 @@
             transition: all 0.3s;
             font-weight: bold;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-            position: absolute;
             touch-action: manipulation;
             user-select: none;
+            position: relative;
         }
         
         .yes-button {
             background-color: #28a745;
             color: white;
-            position: relative;
             z-index: 10;
         }
         
@@ -224,19 +229,13 @@
         }
         
         .no-button {
-            background-color: #dc3545;
+            background-color: #ff6b6b;
             color: white;
-            position: absolute;
             z-index: 5;
-            transition: all 0.1s ease-out !important;
         }
         
         .no-button:hover, .no-button:active {
-            background-color: #c82333;
-        }
-        
-        .runaway {
-            animation: runawayMove 0.2s ease-out forwards !important;
+            background-color: #e05555;
         }
         
         .result-message {
@@ -246,7 +245,7 @@
         }
         
         .result-message h2 {
-            color: #28a745;
+            color: #ff4d8d;
             font-size: 2.5rem;
             margin-bottom: 20px;
         }
@@ -300,7 +299,7 @@
         .wrong-attempts {
             margin-top: 10px;
             font-size: 1.1rem;
-            color: #dc3545;
+            color: #ff6b6b;
             min-height: 25px;
         }
         
@@ -356,11 +355,6 @@
             animation: wrongFlash 0.5s;
         }
         
-        @keyframes runawayMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(var(--move-x, 100px), var(--move-y, -50px)); }
-        }
-        
         footer {
             margin-top: 30px;
             color: #666;
@@ -373,9 +367,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>For My Love 💖</h1>
+            <h1>To My Love, Stephany 💖</h1>
             <div class="heart"><i class="fas fa-heart"></i></div>
-            <p>My dearest, answer these 5 questions to reveal a special Valentine's Day message!</p>
         </div>
         
         <div class="progress-bar">
@@ -385,6 +378,7 @@
         <!-- Question 1 -->
         <div class="question-container active" id="question1">
             <div class="question-number">Question 1 of 5</div>
+            <p style="color: #666; font-size: 1.2rem; margin-bottom: 20px;">Stephany my love, answer these 5 questions to see how well you know me:</p>
             <div class="question-text">When did we first meet?</div>
             <div class="options-container">
                 <div class="option" data-correct="false">At a coffee shop</div>
@@ -429,7 +423,7 @@
             <div class="question-number">Question 4 of 5</div>
             <div class="question-text">What's our song?</div>
             <div class="options-container">
-                <div class="option" data-correct="true"><span class="perfect">"Perfect"</span> by Ed Sheeran</div>
+                <div class="option" data-correct="true">"You sang to me" by Marc Anthony</div>
                 <div class="option" data-correct="false">"All of Me" by John Legend</div>
                 <div class="option" data-correct="false">"I Will Always Love You" by Whitney Houston</div>
                 <div class="option" data-correct="false">"Thinking Out Loud" by Ed Sheeran</div>
@@ -454,8 +448,8 @@
         
         <!-- Final Message -->
         <div class="final-message" id="finalMessage">
-            <h2>Will you be my Valentine? 💝</h2>
             <p>My dearest, you've answered all the questions correctly! Now comes the most important one...</p>
+			<h2>Will you be my Valentine? 💝</h2>
             <div class="heart bounce"><i class="fas fa-heart"></i></div>
             <div class="final-buttons">
                 <button class="final-button yes-button" id="yesButton">YES!</button>
@@ -467,14 +461,14 @@
         <div class="result-message" id="resultMessage">
             <h2><span class="perfect">Perfect!</span> 💖</h2>
             <div class="heart"><i class="fas fa-heart"></i></div>
-            <p><span class="perfect">Perfect</span> choice, my love! ❤️</p>
+            <p>Great choice, my love! ❤️</p>
             <p>Be ready at <strong>8:00 PM on 14-02-2026</strong>.</p>
             <p>I have a very special evening planned for us!</p>
             <p>I can't wait to see you, my Valentine! 💘</p>
         </div>
         
         <footer>
-            © 2026 Powered by Digital Brain - Lebanon
+            Powered by Digital Brain Lebanon - 2026 ©
         </footer>
     </div>
 
@@ -514,9 +508,6 @@
             // Add event listeners to all options
             document.querySelectorAll('.option').forEach(option => {
                 option.addEventListener('click', handleOptionClick);
-                option.addEventListener('touchstart', function(e) {
-                    e.preventDefault(); // Prevent any default touch behavior
-                });
             });
             
             // Add event listeners to final buttons
@@ -524,13 +515,42 @@
             const noButton = document.getElementById('noButton');
             
             yesButton.addEventListener('click', handleYesClick);
-            yesButton.addEventListener('touchstart', handleYesClick, {passive: false});
             
-            // For the No button - move it immediately on touch
-            noButton.addEventListener('touchstart', handleNoTouchStart, {passive: false});
-            noButton.addEventListener('touchend', handleNoTouchEnd, {passive: false});
-            noButton.addEventListener('click', handleNoClick);
-            noButton.addEventListener('mouseover', handleNoHover);
+            // Set up No button to ALWAYS move when trying to click it
+            if (noButton) {
+                // Make it fixed position from the start so it can move anywhere
+                noButton.style.position = 'fixed';
+                noButton.style.zIndex = '9999';
+                
+                // Position it initially next to Yes button
+                positionNoButtonNextToYes(noButton);
+                
+                // Add multiple event listeners to catch ALL interactions
+                noButton.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    moveNoButtonRandomly(noButton);
+                });
+                
+                noButton.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    moveNoButtonRandomly(noButton);
+                }, {passive: false});
+                
+                noButton.addEventListener('mouseover', function(e) {
+                    moveNoButtonRandomly(noButton);
+                });
+                
+                noButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    moveNoButtonRandomly(noButton);
+                });
+                
+                // Also move on touchmove to catch any touch interaction
+                noButton.addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                    moveNoButtonRandomly(noButton);
+                }, {passive: false});
+            }
         });
         
         // Handle option selection
@@ -550,7 +570,7 @@
             if (isCorrect) {
                 // Mark as correct
                 option.classList.add('correct');
-                feedbackElement.innerHTML = '<i class="fas fa-smile happy-face"></i> Correct! You know me so well!';
+                feedbackElement.innerHTML = '<i class="fas fa-smile happy-face"></i> <span class="correct-message">Correct!</span>';
                 feedbackElement.classList.add('happy-face');
                 
                 // Reset wrong attempts display
@@ -568,6 +588,12 @@
                         document.getElementById(`question${questionId}`).classList.remove('active');
                         document.getElementById('finalMessage').style.display = 'block';
                         createConfetti();
+                        
+                        // Reset No button position
+                        const noButton = document.getElementById('noButton');
+                        if (noButton) {
+                            positionNoButtonNextToYes(noButton);
+                        }
                     }
                 }, 1500);
             } else {
@@ -608,152 +634,79 @@
         
         // Handle Yes button click/touch
         function handleYesClick(e) {
-            if (e.type === 'touchstart') {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+            e.preventDefault();
             document.getElementById('finalMessage').style.display = 'none';
             document.getElementById('resultMessage').style.display = 'block';
             createConfetti();
         }
         
-        // Handle No button touch start (for mobile)
-        function handleNoTouchStart(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const button = e.currentTarget;
-            const container = document.querySelector('.final-buttons');
+        // Position No button next to Yes button initially
+        function positionNoButtonNextToYes(noButton) {
+            const yesButton = document.getElementById('yesButton');
+            const container = document.querySelector('.container');
             const containerRect = container.getBoundingClientRect();
             
-            // Move button immediately on touch
-            moveNoButton(button, containerRect);
-            
-            // Add runaway animation class
-            button.classList.add('runaway');
-            
-            // Show message encouraging to click Yes
-            showNoButtonMessage(button);
-            
-            return false;
+            if (yesButton) {
+                const yesRect = yesButton.getBoundingClientRect();
+                const buttonWidth = noButton.offsetWidth;
+                
+                // Position to the right of Yes button
+                const x = yesRect.right + 30;
+                const y = yesRect.top;
+                
+                noButton.style.left = `${x}px`;
+                noButton.style.top = `${y}px`;
+                noButton.style.transition = 'none'; // No transition for initial position
+            }
         }
         
-        // Handle No button touch end
-        function handleNoTouchEnd(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-        
-        // Handle No button hover (for desktop)
-        function handleNoHover(event) {
-            const button = event.target;
-            const container = document.querySelector('.final-buttons');
-            const containerRect = container.getBoundingClientRect();
-            
-            // Move button
-            moveNoButton(button, containerRect);
-            
-            // Add runaway animation class
-            button.classList.add('runaway');
-            
-            // Remove animation class after animation completes
-            setTimeout(() => {
-                button.classList.remove('runaway');
-            }, 200);
-        }
-        
-        // Move the No button to a new random position
-        function moveNoButton(button, containerRect) {
-            // Calculate new random position within container
+        // Move No button randomly on the screen - ALWAYS moves when called
+        function moveNoButtonRandomly(button) {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
             const buttonWidth = button.offsetWidth;
             const buttonHeight = button.offsetHeight;
-            const maxX = containerRect.width - buttonWidth - 20;
-            const maxY = containerRect.height - buttonHeight - 20;
             
-            // Generate random position that's far from current position
+            // Calculate safe area (keep button fully visible)
+            const maxX = viewportWidth - buttonWidth - 20;
+            const maxY = viewportHeight - buttonHeight - 20;
+            
+            // Get current position
             const currentX = parseInt(button.style.left) || 0;
             const currentY = parseInt(button.style.top) || 0;
             
+            // Generate new position far from current position
             let newX, newY;
             let attempts = 0;
+            const minDistance = 150; // Minimum distance to move
             
-            // Try to find a position that's far enough from current
             do {
                 newX = Math.random() * maxX;
                 newY = Math.random() * maxY;
                 attempts++;
-            } while (Math.abs(newX - currentX) < 50 && Math.abs(newY - currentY) < 50 && attempts < 10);
+                
+                // Calculate distance from current position
+                const distance = Math.sqrt(Math.pow(newX - currentX, 2) + Math.pow(newY - currentY, 2));
+                
+                // Accept position if it's far enough or we've tried too many times
+                if (distance >= minDistance || attempts > 20) {
+                    break;
+                }
+            } while (true);
             
-            // Apply new position
+            // Apply position with fast transition
+            button.style.transition = 'all 0.1s ease-out';
             button.style.left = `${newX}px`;
             button.style.top = `${newY}px`;
             
-            // Calculate movement distance for animation
-            const moveX = newX - currentX;
-            const moveY = newY - currentY;
-            
-            // Set CSS variables for animation
-            button.style.setProperty('--move-x', `${moveX}px`);
-            button.style.setProperty('--move-y', `${moveY}px`);
-        }
-        
-        // Handle No button click (if they manage to click it)
-        function handleNoClick(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const button = e.currentTarget;
-            const container = document.querySelector('.final-buttons');
-            const containerRect = container.getBoundingClientRect();
-            
-            // Move button again
-            moveNoButton(button, containerRect);
-            
-            // Add runaway animation class
-            button.classList.add('runaway');
-            
-            // Show message encouraging to click Yes
-            showNoButtonMessage(button);
-            
-            // Remove animation class after animation completes
+            // Add shake effect
+            button.classList.add('shake');
             setTimeout(() => {
-                button.classList.remove('runaway');
-            }, 200);
+                button.classList.remove('shake');
+            }, 500);
             
+            // Prevent any default actions
             return false;
-        }
-        
-        // Show message when trying to click No
-        function showNoButtonMessage(button) {
-            // Remove previous feedback if exists
-            const oldFeedback = document.querySelector('.no-feedback');
-            if (oldFeedback) oldFeedback.remove();
-            
-            // Create new feedback message
-            const feedback = document.createElement('div');
-            feedback.innerHTML = '<i class="fas fa-frown sad-face"></i> Oh no! Please say YES! ❤️';
-            feedback.style.color = '#dc3545';
-            feedback.style.marginTop = '10px';
-            feedback.style.fontSize = '1.2rem';
-            feedback.style.position = 'absolute';
-            feedback.style.top = '100%';
-            feedback.style.left = '50%';
-            feedback.style.transform = 'translateX(-50%)';
-            feedback.style.whiteSpace = 'nowrap';
-            feedback.style.zIndex = '100';
-            feedback.style.background = 'rgba(255, 255, 255, 0.9)';
-            feedback.style.padding = '8px 15px';
-            feedback.style.borderRadius = '10px';
-            feedback.style.boxShadow = '0 3px 10px rgba(0,0,0,0.1)';
-            
-            feedback.classList.add('no-feedback');
-            button.parentNode.appendChild(feedback);
-            
-            // Remove feedback after 2 seconds
-            setTimeout(() => {
-                feedback.remove();
-            }, 2000);
         }
         
         // Update progress bar
@@ -791,6 +744,28 @@
                 };
             }
         }
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const noButton = document.getElementById('noButton');
+            if (noButton && document.getElementById('finalMessage').style.display === 'block') {
+                // Keep button on screen if it's currently fixed
+                const currentLeft = parseInt(noButton.style.left);
+                const currentTop = parseInt(noButton.style.top);
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const buttonWidth = noButton.offsetWidth;
+                const buttonHeight = noButton.offsetHeight;
+                
+                // Adjust position if button is off-screen
+                if (currentLeft > viewportWidth - buttonWidth) {
+                    noButton.style.left = `${viewportWidth - buttonWidth - 20}px`;
+                }
+                if (currentTop > viewportHeight - buttonHeight) {
+                    noButton.style.top = `${viewportHeight - buttonHeight - 20}px`;
+                }
+            }
+        });
     </script>
 </body>
 </html>
