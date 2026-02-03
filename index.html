@@ -188,10 +188,12 @@
         .final-buttons {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 30px;
             margin-top: 40px;
             position: relative;
             min-height: 120px;
+            flex-wrap: wrap;
         }
         
         @media (max-width: 600px) {
@@ -214,7 +216,6 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
             touch-action: manipulation;
             user-select: none;
-            position: relative;
         }
         
         .yes-button {
@@ -367,7 +368,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>To My Love, Stephany 💖</h1>
+            <h1>To My Love, Stephany</h1>
             <div class="heart"><i class="fas fa-heart"></i></div>
         </div>
         
@@ -448,8 +449,9 @@
         
         <!-- Final Message -->
         <div class="final-message" id="finalMessage">
-            <p>My dearest, you've answered all the questions correctly! Now comes the most important one...</p>
+            <p>Now comes the most important one...</p>
 			<h2>Will you be my Valentine? 💝</h2>
+			<p>Try clicking 'No' if you dare... 😉</p>
             <div class="heart bounce"><i class="fas fa-heart"></i></div>
             <div class="final-buttons">
                 <button class="final-button yes-button" id="yesButton">YES!</button>
@@ -518,12 +520,11 @@
             
             // Set up No button to ALWAYS move when trying to click it
             if (noButton) {
-                // Make it fixed position from the start so it can move anywhere
-                noButton.style.position = 'fixed';
-                noButton.style.zIndex = '9999';
-                
-                // Position it initially next to Yes button
-                positionNoButtonNextToYes(noButton);
+                // Start with normal position
+                noButton.style.position = 'relative';
+                noButton.style.left = '0';
+                noButton.style.top = '0';
+                noButton.style.transform = 'none';
                 
                 // Add multiple event listeners to catch ALL interactions
                 noButton.addEventListener('mousedown', function(e) {
@@ -592,7 +593,7 @@
                         // Reset No button position
                         const noButton = document.getElementById('noButton');
                         if (noButton) {
-                            positionNoButtonNextToYes(noButton);
+                            resetNoButtonPosition(noButton);
                         }
                     }
                 }, 1500);
@@ -640,28 +641,22 @@
             createConfetti();
         }
         
-        // Position No button next to Yes button initially
-        function positionNoButtonNextToYes(noButton) {
-            const yesButton = document.getElementById('yesButton');
-            const container = document.querySelector('.container');
-            const containerRect = container.getBoundingClientRect();
-            
-            if (yesButton) {
-                const yesRect = yesButton.getBoundingClientRect();
-                const buttonWidth = noButton.offsetWidth;
-                
-                // Position to the right of Yes button
-                const x = yesRect.right + 30;
-                const y = yesRect.top;
-                
-                noButton.style.left = `${x}px`;
-                noButton.style.top = `${y}px`;
-                noButton.style.transition = 'none'; // No transition for initial position
-            }
+        // Reset No button to centered position
+        function resetNoButtonPosition(noButton) {
+            noButton.style.position = 'relative';
+            noButton.style.left = '0';
+            noButton.style.top = '0';
+            noButton.style.transform = 'none';
+            noButton.style.transition = 'none';
+            noButton.style.zIndex = '5';
         }
         
         // Move No button randomly on the screen - ALWAYS moves when called
         function moveNoButtonRandomly(button) {
+            // Change to fixed position to move anywhere
+            button.style.position = 'fixed';
+            button.style.zIndex = '9999';
+            
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
             const buttonWidth = button.offsetWidth;
@@ -672,8 +667,8 @@
             const maxY = viewportHeight - buttonHeight - 20;
             
             // Get current position
-            const currentX = parseInt(button.style.left) || 0;
-            const currentY = parseInt(button.style.top) || 0;
+            const currentX = parseInt(button.style.left) || (viewportWidth/2 - buttonWidth/2);
+            const currentY = parseInt(button.style.top) || (viewportHeight/2 - buttonHeight/2);
             
             // Generate new position far from current position
             let newX, newY;
@@ -718,7 +713,7 @@
         // Create confetti effect
         function createConfetti() {
             const container = document.querySelector('.container');
-            const colors = ['#ff4d8d', '#ffafbd', '#d63384', '#ffc3a0', '#ff6b9d'];
+            const colors = ['#ff4d8d', '#ffafbd, #d63384, #ffc3a0, #ff6b9d'];
             
             for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement('div');
