@@ -11,6 +11,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -21,6 +22,7 @@
             align-items: center;
             padding: 20px;
             overflow-x: hidden;
+            touch-action: manipulation;
         }
         
         .container {
@@ -45,6 +47,12 @@
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             animation: pulse 2s infinite;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
         }
         
         .header p {
@@ -83,6 +91,12 @@
             padding: 0 10px;
         }
         
+        @media (max-width: 600px) {
+            .question-text {
+                font-size: 1.5rem;
+            }
+        }
+        
         .options-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -93,6 +107,7 @@
         @media (max-width: 600px) {
             .options-container {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
         }
         
@@ -105,9 +120,11 @@
             cursor: pointer;
             transition: all 0.3s;
             color: #333;
+            touch-action: manipulation;
+            user-select: none;
         }
         
-        .option:hover {
+        .option:hover, .option:active {
             background-color: #ffecf1;
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -167,6 +184,17 @@
             justify-content: center;
             gap: 30px;
             margin-top: 40px;
+            position: relative;
+            min-height: 120px;
+        }
+        
+        @media (max-width: 600px) {
+            .final-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                min-height: 180px;
+            }
         }
         
         .final-button {
@@ -178,14 +206,19 @@
             transition: all 0.3s;
             font-weight: bold;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            touch-action: manipulation;
+            user-select: none;
         }
         
         .yes-button {
             background-color: #28a745;
             color: white;
+            position: relative;
+            z-index: 10;
         }
         
-        .yes-button:hover {
+        .yes-button:hover, .yes-button:active {
             background-color: #218838;
             transform: scale(1.05);
         }
@@ -193,16 +226,17 @@
         .no-button {
             background-color: #dc3545;
             color: white;
-            position: relative;
+            position: absolute;
+            z-index: 5;
+            transition: all 0.1s ease-out !important;
         }
         
-        .no-button:hover {
+        .no-button:hover, .no-button:active {
             background-color: #c82333;
         }
         
         .runaway {
-            position: absolute;
-            transition: all 0.5s ease;
+            animation: runawayMove 0.2s ease-out forwards !important;
         }
         
         .result-message {
@@ -225,7 +259,7 @@
         }
         
         .perfect {
-            color: #ff0000;
+            color: #d63384 !important;
             font-weight: bold;
         }
         
@@ -300,16 +334,16 @@
             animation: bounce 1s;
         }
         
-        .shake {
-            animation: shake 0.5s;
-        }
-        
         @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
             50% { transform: translateX(10px); }
             75% { transform: translateX(-10px); }
             100% { transform: translateX(0); }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
         }
         
         @keyframes wrongFlash {
@@ -320,6 +354,11 @@
         
         .wrong-flash {
             animation: wrongFlash 0.5s;
+        }
+        
+        @keyframes runawayMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(var(--move-x, 100px), var(--move-y, -50px)); }
         }
         
         footer {
@@ -338,7 +377,7 @@
             <div class="heart"><i class="fas fa-heart"></i></div>
             <p>My dearest, answer these 5 questions to reveal a special Valentine's Day message!</p>
         </div>
-       
+        
         <div class="progress-bar">
             <div class="progress" id="progress"></div>
         </div>
@@ -435,7 +474,7 @@
         </div>
         
         <footer>
-            Powered by Digital Brain - 2026 ©
+            © 2026 Powered by Digital Brain - Lebanon
         </footer>
     </div>
 
@@ -475,12 +514,23 @@
             // Add event listeners to all options
             document.querySelectorAll('.option').forEach(option => {
                 option.addEventListener('click', handleOptionClick);
+                option.addEventListener('touchstart', function(e) {
+                    e.preventDefault(); // Prevent any default touch behavior
+                });
             });
             
             // Add event listeners to final buttons
-            document.getElementById('yesButton').addEventListener('click', handleYesClick);
-            document.getElementById('noButton').addEventListener('mouseover', handleNoHover);
-            document.getElementById('noButton').addEventListener('click', handleNoClick);
+            const yesButton = document.getElementById('yesButton');
+            const noButton = document.getElementById('noButton');
+            
+            yesButton.addEventListener('click', handleYesClick);
+            yesButton.addEventListener('touchstart', handleYesClick, {passive: false});
+            
+            // For the No button - move it immediately on touch
+            noButton.addEventListener('touchstart', handleNoTouchStart, {passive: false});
+            noButton.addEventListener('touchend', handleNoTouchEnd, {passive: false});
+            noButton.addEventListener('click', handleNoClick);
+            noButton.addEventListener('mouseover', handleNoHover);
         });
         
         // Handle option selection
@@ -556,63 +606,154 @@
             }
         }
         
-        // Handle Yes button click
-        function handleYesClick() {
+        // Handle Yes button click/touch
+        function handleYesClick(e) {
+            if (e.type === 'touchstart') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             document.getElementById('finalMessage').style.display = 'none';
             document.getElementById('resultMessage').style.display = 'block';
             createConfetti();
         }
         
-        // Handle No button hover (runaway effect)
-        function handleNoHover(event) {
-            const button = event.target;
-            const container = document.querySelector('.container');
+        // Handle No button touch start (for mobile)
+        function handleNoTouchStart(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const button = e.currentTarget;
+            const container = document.querySelector('.final-buttons');
             const containerRect = container.getBoundingClientRect();
-            const buttonRect = button.getBoundingClientRect();
             
-            // Calculate new random position within container
-            const maxX = containerRect.width - buttonRect.width - 20;
-            const maxY = containerRect.height - buttonRect.height - 20;
+            // Move button immediately on touch
+            moveNoButton(button, containerRect);
             
-            const newX = Math.random() * maxX;
-            const newY = Math.random() * maxY;
-            
-            // Apply new position
-            button.style.position = 'absolute';
-            button.style.left = `${newX}px`;
-            button.style.top = `${newY}px`;
+            // Add runaway animation class
             button.classList.add('runaway');
             
-            // Add shake effect
-            button.classList.add('shake');
+            // Show message encouraging to click Yes
+            showNoButtonMessage(button);
+            
+            return false;
+        }
+        
+        // Handle No button touch end
+        function handleNoTouchEnd(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        
+        // Handle No button hover (for desktop)
+        function handleNoHover(event) {
+            const button = event.target;
+            const container = document.querySelector('.final-buttons');
+            const containerRect = container.getBoundingClientRect();
+            
+            // Move button
+            moveNoButton(button, containerRect);
+            
+            // Add runaway animation class
+            button.classList.add('runaway');
+            
+            // Remove animation class after animation completes
             setTimeout(() => {
-                button.classList.remove('shake');
-            }, 500);
+                button.classList.remove('runaway');
+            }, 200);
+        }
+        
+        // Move the No button to a new random position
+        function moveNoButton(button, containerRect) {
+            // Calculate new random position within container
+            const buttonWidth = button.offsetWidth;
+            const buttonHeight = button.offsetHeight;
+            const maxX = containerRect.width - buttonWidth - 20;
+            const maxY = containerRect.height - buttonHeight - 20;
+            
+            // Generate random position that's far from current position
+            const currentX = parseInt(button.style.left) || 0;
+            const currentY = parseInt(button.style.top) || 0;
+            
+            let newX, newY;
+            let attempts = 0;
+            
+            // Try to find a position that's far enough from current
+            do {
+                newX = Math.random() * maxX;
+                newY = Math.random() * maxY;
+                attempts++;
+            } while (Math.abs(newX - currentX) < 50 && Math.abs(newY - currentY) < 50 && attempts < 10);
+            
+            // Apply new position
+            button.style.left = `${newX}px`;
+            button.style.top = `${newY}px`;
+            
+            // Calculate movement distance for animation
+            const moveX = newX - currentX;
+            const moveY = newY - currentY;
+            
+            // Set CSS variables for animation
+            button.style.setProperty('--move-x', `${moveX}px`);
+            button.style.setProperty('--move-y', `${moveY}px`);
         }
         
         // Handle No button click (if they manage to click it)
-        function handleNoClick(event) {
-            event.preventDefault();
-            handleNoHover(event);
+        function handleNoClick(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const button = e.currentTarget;
+            const container = document.querySelector('.final-buttons');
+            const containerRect = container.getBoundingClientRect();
+            
+            // Move button again
+            moveNoButton(button, containerRect);
+            
+            // Add runaway animation class
+            button.classList.add('runaway');
             
             // Show message encouraging to click Yes
-            const feedback = document.createElement('div');
-            feedback.innerHTML = '<i class="fas fa-frown sad-face"></i> Oh no! Please reconsider...';
-            feedback.style.color = '#dc3545';
-            feedback.style.marginTop = '10px';
-            feedback.style.fontSize = '1.2rem';
+            showNoButtonMessage(button);
             
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                button.classList.remove('runaway');
+            }, 200);
+            
+            return false;
+        }
+        
+        // Show message when trying to click No
+        function showNoButtonMessage(button) {
             // Remove previous feedback if exists
             const oldFeedback = document.querySelector('.no-feedback');
             if (oldFeedback) oldFeedback.remove();
             
-            feedback.classList.add('no-feedback');
-            event.target.parentNode.appendChild(feedback);
+            // Create new feedback message
+            const feedback = document.createElement('div');
+            feedback.innerHTML = '<i class="fas fa-frown sad-face"></i> Oh no! Please say YES! ❤️';
+            feedback.style.color = '#dc3545';
+            feedback.style.marginTop = '10px';
+            feedback.style.fontSize = '1.2rem';
+            feedback.style.position = 'absolute';
+            feedback.style.top = '100%';
+            feedback.style.left = '50%';
+            feedback.style.transform = 'translateX(-50%)';
+            feedback.style.whiteSpace = 'nowrap';
+            feedback.style.zIndex = '100';
+            feedback.style.background = 'rgba(255, 255, 255, 0.9)';
+            feedback.style.padding = '8px 15px';
+            feedback.style.borderRadius = '10px';
+            feedback.style.boxShadow = '0 3px 10px rgba(0,0,0,0.1)';
             
-            // Remove feedback after 3 seconds
+            feedback.classList.add('no-feedback');
+            button.parentNode.appendChild(feedback);
+            
+            // Remove feedback after 2 seconds
             setTimeout(() => {
                 feedback.remove();
-            }, 3000);
+            }, 2000);
         }
         
         // Update progress bar
